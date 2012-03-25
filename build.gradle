@@ -1,0 +1,23 @@
+apply plugin: 'java'
+apply plugin: 'findbugs'
+apply plugin: 'eclipse'
+
+defaultTasks 'build'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'args4j:args4j:2.0+'
+    compile 'com.amazonaws:aws-java-sdk:1.8+'
+}
+
+jar {
+    from {
+        configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': 'net.elprespufferfish.aws.UpdateDns'
+    }
+}
