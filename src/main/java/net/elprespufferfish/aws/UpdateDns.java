@@ -89,8 +89,9 @@ public class UpdateDns {
         return execWithRetries(new Callable<String>() {
             @Override
             public String call() throws Exception {
+                String address = "http://icanhazip.com";
                 try {
-                    URL url = new URL("http://automation.whatismyip.com/n09230945.asp");
+                    URL url = new URL(address);
                     URLConnection urlConnection = url.openConnection();
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"))) {
                         String response = reader.readLine();
@@ -102,7 +103,7 @@ public class UpdateDns {
                         return response;
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException("Could not get current external IP address", e);
+                    throw new RuntimeException("Could not get current external IP address from " + address, e);
                 }
             }
         });
