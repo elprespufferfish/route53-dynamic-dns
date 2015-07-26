@@ -3,7 +3,6 @@ package net.elprespufferfish.aws;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
@@ -13,12 +12,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.route53.AmazonRoute53;
 import com.amazonaws.services.route53.AmazonRoute53Client;
 import com.amazonaws.services.route53.model.Change;
@@ -49,9 +47,6 @@ public class UpdateDns {
 
         @Option(required = true, name = "--record-set", usage = "DNS Record Set to act on", metaVar = "foo.bar.com")
         public String recordSetName;
-
-        @Option(required = true, name = "--aws-credentials-file", usage = "Path to properties file containing your AWS credentials", metaVar = "/path/to/credentials.properties")
-        public String awsCredentialsFilePath;
     }
 
     public static void main(String[] args) throws IOException {
@@ -65,9 +60,7 @@ public class UpdateDns {
             System.exit(1);
         }
 
-        File awsCredentialsFile = new File(arguments.awsCredentialsFilePath);
-        AWSCredentials awsCredentials = new PropertiesCredentials(awsCredentialsFile);
-        AmazonRoute53 route53 = new AmazonRoute53Client(awsCredentials);
+        AmazonRoute53 route53 = new AmazonRoute53Client(new DefaultAWSCredentialsProviderChain());
 
         UpdateDns updateDns = new UpdateDns(route53, arguments.hostedZoneId);
         updateDns.updateDns(arguments.recordSetName);
