@@ -79,7 +79,9 @@ public class UpdateDns {
 
         String currentValue = getCurrentAValue(recordSetName);
 
-        if (!currentIpAddress.equals(currentValue)) {
+        if (currentIpAddress.equals(currentValue)) {
+            System.out.println("Not updating record set as it already points to " + currentIpAddress);
+        } else {
             System.out.println("Updating IP from \"" + currentValue + "\" to \"" + currentIpAddress + "\"");
             updateAValue(recordSetName, currentIpAddress);
         }
