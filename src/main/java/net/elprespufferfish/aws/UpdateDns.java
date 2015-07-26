@@ -47,6 +47,9 @@ public class UpdateDns {
 
         @Option(required = true, name = "--record-set", usage = "DNS Record Set to act on", metaVar = "foo.bar.com")
         public String recordSetName;
+
+        @Option(required = false, name = "--force", usage = "Force update of Route53 record even if IP address is correct")
+        public boolean force;
     }
 
     public static void main(String[] args) throws IOException {
@@ -63,7 +66,7 @@ public class UpdateDns {
         AmazonRoute53 route53 = new AmazonRoute53Client(new DefaultAWSCredentialsProviderChain());
 
         UpdateDns updateDns = new UpdateDns(route53, arguments.hostedZoneId);
-        updateDns.updateDns(arguments.recordSetName);
+        updateDns.updateDns(arguments.recordSetName, arguments.force);
     }
 
     private final AmazonRoute53 route53;
@@ -74,12 +77,12 @@ public class UpdateDns {
         this.hostedZoneId = hostedZoneId;
     }
 
-    private void updateDns(String recordSetName) {
+    private void updateDns(String recordSetName, boolean force) {
         String currentIpAddress = getExternalIpAddress();
 
         String currentValue = getCurrentAValue(recordSetName);
 
-        if (currentIpAddress.equals(currentValue)) {
+        if (currentIpAddress.equals(currentValue) && !force) {
             System.out.println("Not updating record set as it already points to " + currentIpAddress);
         } else {
             System.out.println("Updating IP from \"" + currentValue + "\" to \"" + currentIpAddress + "\"");
